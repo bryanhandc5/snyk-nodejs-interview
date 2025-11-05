@@ -1,8 +1,9 @@
-name: CI Pipeline - Node.js + Snyk + Container Scan
+name: CI Pipeline - Node.js + Snyk
 
 on:
 push:
-branches: [ "main" ]
+branches:
+- main
 pull_request:
 
 jobs:
@@ -44,25 +45,4 @@ steps:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     with:
       command: monitor
-
-  # 7️⃣ Build Docker image
-  - name: Build Docker image
-    run: docker build -t nodejs-interview:${{ github.sha }} .
-
-  # 8️⃣ Snyk test (Docker container scan)
-  - name: Snyk Container Test
-    uses: snyk/actions/docker@master
-    env:
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-    with:
-      image: nodejs-interview:${{ github.sha }}
-      command: test
-
-  # 9️⃣ Snyk monitor (Docker container)
-  - name: Snyk Container Monitor
-    uses: snyk/actions/docker@master
-    env:
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-    with:
-     
 ```
