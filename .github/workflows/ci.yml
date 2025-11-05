@@ -28,14 +28,22 @@ jobs:
       - name: Run tests
         run: npm test || echo "No tests found"
 
-      # 5️⃣ Snyk scan for vulnerabilities
-      - name: Snyk Security Scan
+      # 5️⃣ Snyk test for vulnerabilities
+      - name: Snyk Test
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: test
 
-      # 6️⃣ (Optional) Build Docker image
+      # 6️⃣ Snyk monitor to record project snapshot
+      - name: Snyk Monitor
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+
+      # 7️⃣ (Optional) Build Docker image
       - name: Build Docker image
         run: docker build -t nodejs-interview:${{ github.sha }} .
