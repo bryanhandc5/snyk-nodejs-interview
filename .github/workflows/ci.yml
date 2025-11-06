@@ -12,25 +12,20 @@ runs-on: ubuntu-latest
 
 ```
 steps:
-  # 1️⃣ Checkout repository
   - name: Checkout code
     uses: actions/checkout@v4
 
-  # 2️⃣ Set up Node.js
   - name: Set up Node.js
     uses: actions/setup-node@v4
     with:
       node-version: 18
 
-  # 3️⃣ Install dependencies
   - name: Install dependencies
     run: npm install
 
-  # 4️⃣ Run unit tests
   - name: Run tests
     run: npm test || echo "No tests found"
 
-  # 5️⃣ Snyk test for dependencies
   - name: Snyk Test (Dependencies)
     uses: snyk/actions/node@master
     env:
@@ -39,7 +34,6 @@ steps:
       command: test
     continue-on-error: true
 
-  # 6️⃣ Snyk monitor for dependencies
   - name: Snyk Monitor (Dependencies)
     uses: snyk/actions/node@master
     env:
@@ -48,11 +42,9 @@ steps:
     with:
       command: monitor
 
-  # 7️⃣ Build Docker image
   - name: Build Docker image
     run: docker build -t nodejs-interview:${{ github.sha }} .
 
-  # 8️⃣ Snyk test for Docker container
   - name: Snyk Test (Container)
     uses: snyk/actions/docker@master
     env:
@@ -62,7 +54,6 @@ steps:
       command: test
     continue-on-error: true
 
-  # 9️⃣ Snyk monitor for Docker container
   - name: Snyk Monitor (Container)
     uses: snyk/actions/docker@master
     env:
