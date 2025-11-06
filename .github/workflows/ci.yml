@@ -1,69 +1,74 @@
 name: CI Pipeline - Node.js + Snyk + Container Scan
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
+push:
+branches:
+- main
+pull_request:
 
 jobs:
-  build-test-scan:
-    runs-on: ubuntu-latest
+build-test-scan:
+runs-on: ubuntu-latest
 
-    steps:
-      # 1️⃣ Checkout repository
-      - name: Checkout code
-        uses: actions/checkout@v4
+```
+steps:
+  # 1️⃣ Checkout repository
+  - name: Checkout code
+    uses: actions/checkout@v4
 
-      # 2️⃣ Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+  # 2️⃣ Set up Node.js
+  - name: Set up Node.js
+    uses: actions/setup-node@v4
+    with:
+      node-version: 18
 
-      # 3️⃣ Install dependencies
-      - name: Install dependencies
-        run: npm install
+  # 3️⃣ Install dependencies
+  - name: Install dependencies
+    run: npm install
 
-      # 4️⃣ Run unit tests
-      - name: Run tests
-        run: npm test || echo "No tests found"
+  # 4️⃣ Run unit tests
+  - name: Run tests
+    run: npm test || echo "No tests found"
 
-      # 5️⃣ Snyk test for open-source vulnerabilities
-      - name: Snyk Test (Dependencies)
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-        continue-on-error: true
+  # 5️⃣ Snyk test for dependencies
+  - name: Snyk Test (Dependencies)
+    uses: snyk/actions/node@master
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    with:
+      command: test
+    continue-on-error: true
 
-      # 6️⃣ Upload dependency snapshot to Snyk
-      - name: Snyk Monitor (Dependencies)
-        uses: snyk/actions/node@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
+  # 6️⃣ Snyk monitor for dependencies
+  - name: Snyk Monitor (Dependencies)
+    uses: snyk/actions/node@master
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    if: always()
+    with:
+      command: monitor
 
-      # 7️⃣ Build Docker image
-      - name: Build Docker image
-        run: docker build -t nodejs-interview:${{ github.sha }} .
+  # 7️⃣ Build Docker image
+  - name: Build Docker image
+    run: docker build -t nodejs-interview:${{ github.sha }} .
 
-      # 8️⃣ Test Docker image for vulnerabilities
-      - name: Snyk Test (Container)
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          image: nodejs-interview:${{ github.sha }}
-          command: test
-        continue-on-error: true
+  # 8️⃣ Snyk test for Docker container
+  - name: Snyk Test (Container)
+    uses: snyk/actions/docker@master
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    with:
+      image: nodejs-interview:${{ github.sha }}
+      command: test
+    continue-on-error: true
 
-      # 9️⃣ Upload Docker image snapshot to Snyk
-      - name: Snyk Monitor (Container)
-        uses: snyk/actions/docker@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          image: nodejs-interview:${{ github.sha }}
-          command: monitor
+  # 9️⃣ Snyk monitor for Docker container
+  - name: Snyk Monitor (Container)
+    uses: snyk/actions/docker@master
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    if: always()
+    with:
+      image: nodejs-interview:${{ github.sha }}
+      command: monitor
+```
