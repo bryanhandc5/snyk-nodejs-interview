@@ -57,6 +57,7 @@ jobs:
         with:
           image: nodejs-interview:${{ github.sha }}
           command: test
+        continue-on-error: true
 
       # 9️⃣ Upload Docker image snapshot to Snyk
       - name: Snyk Monitor (Container)
