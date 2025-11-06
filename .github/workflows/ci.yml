@@ -61,4 +61,3 @@ steps:
     with:
       image: nodejs-interview:${{ github.sha }}
       command: monitor
-```
